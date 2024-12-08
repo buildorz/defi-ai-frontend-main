@@ -6,6 +6,9 @@
 [data-theme] {
   background: black;
 }
+html {
+  scroll-behavior: smooth;
+}
 .sent-audio{
   margin-top: 20px;
 }

@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function About() {
   return (
-    <div className="max-w-[1440px] mx-auto">
+    <div id="about" className="max-w-[1440px] mx-auto">
       <div className="flex md:flex-row flex-col md:gap-0  gap-8 items-center  mt-20 mb-10">
         <Image src="/about.png" width={734} height={500} alt="about" unoptimized />
         <div className="md:pl-20 px-5 text-white ">

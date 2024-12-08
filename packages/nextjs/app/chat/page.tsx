@@ -2,15 +2,18 @@
 
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { IUserDetails } from "../../types/userDetails";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
+import toast from "react-hot-toast";
 import Markdown from "react-markdown";
 import { useAccount, useWalletClient } from "wagmi";
 import ChatInput from "~~/components/ChatInput";
 import ConfirmationCard from "~~/components/ConfirmationCard";
+import DeleteConfirmationModal from "~~/components/DeleteConfirmationModal";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { socket } from "~~/lib/socket";
-import { addChatHistory } from "~~/utils/apis/chat-history";
+import { addChatHistory, deleteChatHistory } from "~~/utils/apis/chat-history";
 import { axiosBaseInstance } from "~~/utils/axios";
 import {
   addToLocalStorage,
@@ -20,6 +23,7 @@ import {
   removeFromLocalStorage,
 } from "~~/utils/helper";
 import { notification } from "~~/utils/scaffold-eth";
+import Link from "next/link";
 
 export type Message = {
   id: string | null;
@@ -104,6 +108,7 @@ export default function Chat() {
   const [isMessageLoading, setIsMessageLoading] = useState(false);
   const [connectedWalletAddressBlockchain, setConnectedWalletAddressBlockchain] = useState<string | null>(null);
   const [connectedWalletAddress, setConnectedWalletAddress] = useState<string | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const { data: walletClient } = useWalletClient();
 
@@ -127,6 +132,8 @@ export default function Chat() {
 
   useEffect(() => {
     const handleNewMessageResponse = (data: SocketResponse) => {
+      console.log("new message from socket", data);
+
       if (data?.success) {
         for (const singleData of data.success) {
           if (!singleData.message) continue;
@@ -425,15 +432,39 @@ export default function Chat() {
     scrollChatContainer();
   }, [messages?.length, address]);
 
+  // delete chat history
+  const handleDeleteChatHistory = async () => {
+    try {
+      const userDetails = getFromLocalStorage("userDetails") as IUserDetails;
+
+      if (!userDetails) {
+        toast.error("Unable to delete chat history, reload page and try again");
+      }
+
+      const response = await deleteChatHistory(userDetails.token);
+
+      if (!response?.success) {
+        toast.error("Unable to delete chat history, reload page and try again");
+      }
+
+      setMessages([]);
+      toast.success("Chat history deleted successfully");
+    } catch (error) {
+      console.error("error deleting chat history", error);
+      toast.error("Unable to delete chat history, reload page and try again");
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-black">
       {/* Header with logo */}
-      <div className="flex justify-center">
+      <div className="flex justify-center px-6">
         <header className="relative z-[100] w-[600px] bg-[#ffffff1a] border border-gray-600/20  backdrop-blur-[100px] p-1.5  rounded-full   flex justify-between items-center mt-5 ">
+         <Link href='/'>
           <div className="relative w-8 h-8">
             <Image alt="defiai logo" className="cursor-pointer" fill src="/DefiAIlogo.png" />
-          </div>
-          <div className="flex  gap-2 items-center  text-white">
+          </div></Link>
+          <div className="flex  md:gap-2 items-center  text-white">
             <RainbowKitCustomConnectButton />
           </div>
         </header>
@@ -445,20 +476,32 @@ export default function Chat() {
           <div className="w-full max-w-[1200px] h-[calc(100vh-120px)]">
             <div className="bg-black w-full h-full flex flex-col gap-4">
               <div className="flex justify-end">
-                <button className="bg-[#8f259b] px-6 text-white h-[43px] rounded-full  hover:bg-[#8f259b]/90 transition-colors">
-                  Delete Chat History
-                </button>
+                {messages?.length > 0 && (
+                  <>
+                    <button
+                      className="bg-[#8f259b] px-6 text-white h-[43px] rounded-full  hover:bg-[#8f259b]/90 transition-colors"
+                      onClick={() => setIsDeleteModalOpen(true)}
+                    >
+                      Delete Chat History
+                    </button>
+                    <DeleteConfirmationModal
+                      isOpen={isDeleteModalOpen}
+                      onClose={() => setIsDeleteModalOpen(false)}
+                      onConfirm={handleDeleteChatHistory}
+                    />
+                  </>
+                )}
               </div>
 
               <div className="flex-1  flex flex-col overflow-hidden mt-5">
                 <div
                   ref={containerRef}
-                  className="flex-1 p-6 overflow-y-auto overflow-x-hidden no-scrollbar chat-scrollable-container"
+                  className="flex-1 md:p-6 overflow-y-auto overflow-x-hidden no-scrollbar chat-scrollable-container"
                 >
                   {messages.length === 0 && (
                     <Fragment>
-                      <h4 className="text-white text-[24px] font-semibold">Ask {`DEFI AI`} with your prompt.</h4>
-                      <p className="text-[white]/70 mt-2 text-[20px]">
+                      <h4 className="text-white text-[24px] font-semibold text-center">Ask {`DEFI AI`} with your prompt.</h4>
+                      <p className="text-[white]/70 mt-2 text-[20px] text-center">
                         AI Powered Conversational User Interface for Cryptocurrency.
                       </p>
                     </Fragment>
@@ -498,12 +541,12 @@ export default function Chat() {
                           key={getRandomId()}
                         >
                           {message.role === "USER" ? (
-                            <div className="text-white break-words text-right my-3 bg-[#ffffff1a]   backdrop-blur-[100px] py-3 pl-[22px] pr-[78px] rounded-[20px] max-w-[60%]">
+                            <div className="text-white break-words text-left my-3 bg-[#ffffff1a] md:text-base text-sm   backdrop-blur-[100px] py-3 md:pl-[22px] pl-4 pr-5 md:pr-[78px] rounded-[20px] max-w-[60%]">
                               {message.message}
                             </div>
                           ) : (
                             <div className="flex gap-4 items-center max-w-[60%] my-3">
-                              <div className="text-white break-words text-left bg-[#8f259b] py-3   pl-[22px] pr-[78px] rounded-[20px]">
+                              <div className="text-white break-words text-left bg-[#8f259b] py-3 md:text-base text-sm   md:pl-[22px] pl-4 pr-5 md:pr-[78px] rounded-[20px]">
                                 {message?.hasImage && (
                                   <img
                                     src={`data:image/png;base64,${message?.data}`}
@@ -599,7 +642,7 @@ export default function Chat() {
           <div className="flex justify-center items-center h-[80vh] ">
             <div className="w-full max-w-[400px] flex  flex-col gap-4 bg-[#171717] rounded-[15px] p-8 text-white text-center">
               <span className="text-xl font-medium">Connect Wallet to get started!</span>
-              <div className="flex flex-col gap-3 justify-center">
+              <div className="flex flex-col gap-3 justify-center items-center">
                 <RainbowKitCustomConnectButton />
               </div>
             </div>

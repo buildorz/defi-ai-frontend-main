@@ -1,6 +1,6 @@
 export const SUPPORTED_BLOCKCHAINS = {
   ETHEREUM: "ETHEREUM",
   POLYGON: "POLYGON",
-  BSC: 'BSC',
-  BASE: 'BASE'
+  BSC: "BSC",
+  BASE: "BASE",
 };

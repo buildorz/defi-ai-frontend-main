@@ -21,16 +21,16 @@ export const menuLinks: HeaderMenuLink[] = [
   },
 
   {
-    label: "Feauturess",
-    href: "/feautures",
+    label: "Features",
+    href: "#features",
   },
   {
     label: "About",
-    href: "/about",
+    href: "#about",
   },
   {
     label: "Contact",
-    href: "/contact",
+    href: "/",
   },
 ];
 

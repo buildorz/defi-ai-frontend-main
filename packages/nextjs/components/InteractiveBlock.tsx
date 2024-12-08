@@ -73,12 +73,6 @@ const InteractiveBlocks: React.FC = () => {
     };
   }, []);
 
-  const [isMinivoice, setIsMinivoice] = useState(true);
-
-  const handleToggle = () => {
-    setIsMinivoice(prevState => !prevState);
-  };
-
   return (
     <div className="relative ">
       <div id="blocks" ref={blockContainerRef}></div>
@@ -135,12 +129,12 @@ const InteractiveBlocks: React.FC = () => {
             </div>
           </div>
           <div className="relative col-span-1 bg-[#1c1c1c] p-5 rounded-[12px] md:h-full h-[250px] overflow-hidden">
-            <div className="flex gap-3 items-center">
+            <div className="flex gap-3 items-center relative z-[10]">
               {" "}
               <h4 className="text-[24px]">Voice Command</h4>
               <p className="text-[10px] bg-[#8f259b] px-2 py-[3px] rounded-full">New</p>
             </div>
-            <p className="text-sm w-[300px] mt-2">
+            <p className="text-sm w-[300px] mt-2 relative z-[10]">
               Talk to DeFi AI like you would a friend. From swapping tokens to checking your portfolio, just say the
               word and let the AI handle the rest.
             </p>

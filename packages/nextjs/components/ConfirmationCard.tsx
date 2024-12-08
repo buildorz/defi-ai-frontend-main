@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { purchaseBaseName } from "../lib/blockchains/base/buyBaseName";
 import { sendEthereumTransaction } from "../lib/blockchains/ethereum/sendTransaction";
 import { addChatHistory } from "../utils/apis/chat-history";
 import { axiosBaseInstance } from "../utils/axios";
 import Markdown from "react-markdown";
 import { Message } from "~~/app/chat/page";
+import { stakeAndDelegate } from "~~/lib/eigenlayer/eigen";
 import { SUPPORTED_BLOCKCHAINS } from "~~/utils/constants";
 import { getFromLocalStorage } from "~~/utils/helper";
 
@@ -47,6 +49,8 @@ const ConfirmationCard = ({
   const blockchain = data?.blockchain;
   const functionType = data?.function;
 
+  console.log("confirmation card - 1 ", { blockchain, functionType });
+
   const handleDecline = async (): Promise<void> => {
     replaceMessage(index, {
       message: "You declined the transaction",
@@ -70,15 +74,30 @@ const ConfirmationCard = ({
     let finalSuccess = false;
 
     try {
-      if (blockchain === SUPPORTED_BLOCKCHAINS.ETHEREUM) {
-        if (functionType === "send" || functionType === "swap") {
-          const response: any = await sendEthereumTransaction(data as any);
-          if (response.tx) {
-            setTx(response.tx);
-          }
-          message = response.message;
-          finalSuccess = response.success;
+      if (functionType === "send" || functionType === "swap") {
+        const response: any = await sendEthereumTransaction(data as any);
+        if (response.tx) {
+          setTx(response.tx);
         }
+        message = response.message;
+        finalSuccess = response.success;
+      } else if (functionType === "register_base_name") {
+        const response = await purchaseBaseName(data as any);
+
+        if (response?.tx) {
+          setTx(String(response.tx));
+        }
+
+        message = response.message;
+        finalSuccess = response.success;
+      } else if (functionType === "restake") {
+        console.log("restake - 1 ", data);
+        const response: any = await stakeAndDelegate(data as any);
+        if (response?.tx) {
+          setTx(String(response.tx));
+        }
+        message = response.message;
+        finalSuccess = response.success;
       }
 
       setIsConfirmLoading(false);
@@ -134,10 +153,10 @@ const ConfirmationCard = ({
           Decline
         </button>
         <button
-          className="bg-[#26A69A] rounded-md py-2 px-6 sm:px-12  flex justify-center items-center  text-[16px] text-white transition ease-in-out duration-200 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          className={`bg-[#26A69A] rounded-md py-2 px-6 sm:px-12  flex justify-center items-center  text-[16px] text-white transition ease-in-out duration-200 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${isConfirmLoading && "pointer-events-none cursor-not-allowed"}`}
           onClick={() => handleAccept(data)}
         >
-          {isConfirmLoading ? <span className="confirmBtnLoaderGray"></span> : <span>Confirm</span>}
+          {isConfirmLoading ? <span className="confirmBtnLoaderGray">Loading....</span> : <span>Confirm</span>}
         </button>
       </div>
     </div>

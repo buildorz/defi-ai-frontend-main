@@ -1,4 +1,4 @@
-import { SUPPORTED_BLOCKCHAINS } from "~~/utils/constants";
+import { SUPPORTED_BLOCKCHAINS } from "./constants";
 
 export const addToLocalStorage = <T>(key: string, value: T): void => {
   localStorage.setItem(key, JSON.stringify(value));
@@ -25,7 +25,7 @@ export const getBlockchainNameFromId = (chainId: number): string => {
       return SUPPORTED_BLOCKCHAINS.POLYGON;
     case 56:
       return SUPPORTED_BLOCKCHAINS.BSC;
-    case 43114:
+    case 8453:
       return SUPPORTED_BLOCKCHAINS.BASE;
     default:
       return "UNKNOWN";
