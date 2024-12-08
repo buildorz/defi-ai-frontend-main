@@ -12,8 +12,13 @@ import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { socket } from "~~/lib/socket";
 import { addChatHistory } from "~~/utils/apis/chat-history";
 import { axiosBaseInstance } from "~~/utils/axios";
-import { SUPPORTED_BLOCKCHAINS } from "~~/utils/constants";
-import { addToLocalStorage, getFromLocalStorage, getRandomId, removeFromLocalStorage } from "~~/utils/helper";
+import {
+  addToLocalStorage,
+  getBlockchainNameFromId,
+  getFromLocalStorage,
+  getRandomId,
+  removeFromLocalStorage,
+} from "~~/utils/helper";
 import { notification } from "~~/utils/scaffold-eth";
 
 export type Message = {
@@ -88,7 +93,7 @@ export default function Chat() {
   socket.connect();
 
   const [messages, setMessages] = useState<Message[]>([]);
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chain } = useAccount();
   const [tokenExists, setTokenExists] = useState<boolean>(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [selectedNetwork, setSelectedNetwork] = useState<string | null>(null);
@@ -184,6 +189,14 @@ export default function Chat() {
     handleWalletConnection();
   }, [connectedWalletAddress]);
 
+  useEffect(() => {
+    if (chain) {
+      setConnectedWalletAddressBlockchain(getBlockchainNameFromId(chain.id));
+    } else {
+      setConnectedWalletAddressBlockchain(null);
+    }
+  }, [chain]);
+
   const fetchPreviousChats = async (token: string): Promise<void> => {
     setIsScreenLoading(true);
 
@@ -224,12 +237,8 @@ export default function Chat() {
         blockchain: connectedWalletAddressBlockchain,
       });
 
-      const accessCode = getFromLocalStorage<string>("accessCode");
-
       const response = await axiosBaseInstance().post<AuthResponse>("/api/auth/authenticate", {
         wallet: connectedWalletAddress,
-        walletBlockchain: connectedWalletAddressBlockchain,
-        waitlistCode: accessCode ? parseInt(accessCode) : undefined,
       });
 
       if (response.status === 200) {
@@ -254,10 +263,15 @@ export default function Chat() {
   };
 
   useEffect(() => {
+    // check if wallet not connected and show notification
+    if (!isConnected) {
+      notification.info("Please connect your wallet to use the chat");
+    }
+
     if (isConnected && walletClient?.account) {
       console.log("Setting wallet address and blockchain");
       setConnectedWalletAddress(walletClient.account.address);
-      setConnectedWalletAddressBlockchain(SUPPORTED_BLOCKCHAINS.ETHEREUM);
+      setConnectedWalletAddressBlockchain(getBlockchainNameFromId(chain?.id || 1));
     } else {
       setConnectedWalletAddress(null);
       setConnectedWalletAddressBlockchain(null);
@@ -265,11 +279,6 @@ export default function Chat() {
       removeFromLocalStorage("userDetails");
     }
   }, [isConnected, walletClient]);
-  useEffect(() => {
-    if (!isConnected) {
-      notification.info("Please connect your wallet to use the chat");
-    }
-  }, [isConnected]);
 
   const handleClearCanvas = (): void => {
     if (chatInputRef.current) {
@@ -277,8 +286,9 @@ export default function Chat() {
     }
   };
 
+  // scroll chat container to bottom to show new messages
   const scrollChatContainer = (): void => {
-    const scrollHeight = Math.ceil(containerRef?.current?.scrollHeight || 0);
+    const scrollHeight = Math.ceil(containerRef?.current?.scrollHeight || 0) - 100;
 
     const handleScroll = () => {
       if (scrollHeight && containerRef.current) {
@@ -292,10 +302,12 @@ export default function Chat() {
     setTimeout(handleScroll, 300);
   };
 
+  // remove message from messages array
   const deleteMessage = (index: number): void => {
     setMessages(messages.filter((_, i) => i !== index));
   };
 
+  // replace message in messages array
   const replaceMessage = (index: number, newMessage: Message): void => {
     const message = messages[index];
 
@@ -306,11 +318,12 @@ export default function Chat() {
     setMessages(messages.map((message, i) => (i === index ? newMessage : message)));
   };
 
+  // add message to messages array
   const addMessage = (message: Message): void => {
     setMessages([...messages, message]);
   };
 
-  const sendMessage = async (message: string | Blob, audioMessage: boolean = false) => {
+  const sendMessage = async (message: string | Blob, audioMessage = false) => {
     socket.emit("newMessage", {
       userId: userId,
       blockchain: connectedWalletAddressBlockchain,
@@ -326,7 +339,7 @@ export default function Chat() {
 
   useEffect(() => {
     const lastMessage = messages?.length > 0 && (messages[messages.length - 1] as Message);
-    let lastMessageIndex = messages?.length - 1;
+    const lastMessageIndex = messages?.length - 1;
 
     if (lastMessage && lastMessage?.confirmationTime && !lastMessage.userInteracted) {
       const timeoutId: NodeJS.Timeout = setTimeout(async () => {
@@ -363,6 +376,9 @@ export default function Chat() {
         }),
       );
     }
+
+    // scroll chat container to bottom to show new messages
+    scrollChatContainer();
   }, [messages.length]);
 
   const handleInputSend = async (recordedBlob: Blob | null, inputText: string | null): Promise<void> => {
@@ -410,161 +426,185 @@ export default function Chat() {
   }, [messages?.length, address]);
 
   return (
-    <div className="max-w-[1440px] mx-auto flex justify-center items-center w-full h-screen">
-      {connectedWalletAddress && tokenExists ? (
-        <div className="w-full h-[70vh] rounded-[10px] btn">
-          <div className="bg-black w-full h-full rounded-[10px] flex flex-col gap-[20px] justify-between p-8">
-            <div className="flex justify-between items-center mb-5">
-              <div className="flex items-center gap-4">
-                <button className="bg-[#8f259b] px-6 text-white h-[43px] rounded-[8px]">Delete Chat History</button>
-              </div>
-              <div className="flex relative w-10 h-10">
-                <Image alt="defiai logo" className="cursor-pointer" fill src="/DefiAIlogo.png" />
-              </div>
-              <div className="flex items-center gap-4">
-                <button className="px-6 text-white/50 h-[43px] rounded-[8px]">About</button>
-                <RainbowKitCustomConnectButton />
-              </div>
-            </div>
-            <div className="w-full h-full border border-[#8f259b] rounded-[10px] flex justify-center items-center flex-col p-4 overflow-auto no-scrollbar chat-scrollable-container">
-              {messages.length === 0 && (
-                <Fragment>
-                  <h4 className="text-white text-[24px] font-semibold">Ask {`DEFI AI`} with your prompt.</h4>
-                  <p className="text-[white]/70 mt-2 text-[20px]">
-                    AI Powered Conversational User Interface for Cryptocurrency.
-                  </p>
-                </Fragment>
-              )}
-
-              {messages.length > 0 &&
-                messages.map((message, index) =>
-                  message.confirmationCard ? (
-                    <div key={getRandomId()} className="w-full  mt-20">
-                      <ConfirmationCard
-                        message={message.message}
-                        data={message.data as any}
-                        deleteMessage={() => deleteMessage(index)}
-                        addMessage={addMessage}
-                        replaceMessage={replaceMessage}
-                        index={index}
-                      />
-                    </div>
-                  ) : message.audio ? (
-                    <div className="sent-audio flex flex-wrap justify-end pb-[25px]" key={getRandomId()}>
-                      <AudioPlayer
-                        src={URL.createObjectURL(message.audio)}
-                        autoPlay={false}
-                        onPlay={() => console.log("onPlay")}
-                        customAdditionalControls={[]}
-                        loop={false}
-                        autoPlayAfterSrcChange={false}
-                        showJumpControls={false}
-                        layout="horizontal-reverse"
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      className={`relative w-full ${message.role === "USER" ? "flex justify-end" : "flex justify-start"} ${
-                        message.role === "USER" ? "text-right" : "max-w-fit rounded-lg leading-4"
-                      }`}
-                      key={getRandomId()}
-                    >
-                      {message.role === "USER" ? (
-                        <div className="my-[.7rem] text-left font-medium text-base max-sm:text-[15px] text-wrap  rounded-[10px] leading-[24px] bg-[#202020] py-3 flex items-center pl-[22px] pr-[78px] text-white">
-                          {message.message}
-                        </div>
-                      ) : (
-                        <div className="flex gap-4 items-start max-w-[70%]">
-                          <div className="text-white break-words text-left bg-gray-900 p-[1rem] rounded-[10px]">
-                            {message?.hasImage && (
-                              <img
-                                src={`data:image/png;base64,${message?.data}`}
-                                alt="chart-image"
-                                className={"size-fit py-2 px-4 pb-4"}
-                              />
-                            )}
-                            <div
-                              key={getRandomId()}
-                              className={`mb-[25px] font-medium  tesxt-[16px] max-sm:text-[15px]  pt-0 text-wrap break-words text-base leading-[24px]`}
-                            >
-                              <Markdown
-                                children={message.message}
-                                components={{
-                                  a: ({ node, ...props }) => (
-                                    <a
-                                      style={{
-                                        textDecoration: "underline",
-                                        marginBottom: "1em",
-                                      }}
-                                      target="_blank"
-                                      {...props}
-                                    />
-                                  ),
-                                  p: ({ node, ...props }) => <p {...props} />,
-                                  h1: ({ node, ...props }) => (
-                                    <h1
-                                      style={{
-                                        marginTop: "1em",
-                                        marginBottom: "0.5em",
-                                      }}
-                                      {...props}
-                                    />
-                                  ),
-                                  h2: ({ node, ...props }) => (
-                                    <h2
-                                      style={{
-                                        marginTop: "1em",
-                                        marginBottom: "0.5em",
-                                      }}
-                                      {...props}
-                                    />
-                                  ),
-                                  li: ({ node, ...props }) => <li style={{ marginBottom: "0.5em" }} {...props} />,
-                                }}
-                              />
-
-                              {/* show retry button if retryAvailable is true */}
-                              {message?.retryAvailable && (
-                                <button
-                                  className="text-white text-sm rounded-md p-2 mt-3 bg-[#B18C07] font-medium hover:bg-[#9d7c05]"
-                                  onClick={() => {
-                                    setIsMessageLoading(true);
-                                    if (message?.retryQuery) {
-                                      sendMessage(message?.retryQuery);
-                                    }
-                                    replaceMessage(index, {
-                                      ...message,
-                                      retryAvailable: false,
-                                    });
-                                  }}
-                                >
-                                  {message?.retryText || "Retry Request"}
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ),
-                )}
-
-              {isMessageLoading && (
-                <div className="py-4 bg-[#202020] w-[100px] flex self-start justify-center items-center rounded-[26px]">
-                  <span className="loader"></span>
-                </div>
-              )}
-            </div>
-
-            <ChatInput ref={chatInputRef} sendBtnHandler={handleInputSend} setIsMessageLoading={setIsMessageLoading} />
-          </div>
+    <div className="min-h-screen flex flex-col bg-black">
+      {/* Header with logo */}
+    <div className="flex justify-center">
+        <header className="relative z-[100] w-[600px] bg-[#ffffff1a] border border-gray-600/20  backdrop-blur-[100px] p-1.5  rounded-full   flex justify-between items-center mt-5 ">
+        <div className="relative w-8 h-8">
+          <Image alt="defiai logo" className="cursor-pointer" fill src="/DefiAIlogo.png" />
         </div>
-      ) : (
-        <div className="flex flex-col gap-4 bg-[#171717] rounded-[15px] top-0 bottom-0 m-auto p-11 text-white text-[14px] md:text-[18px]">
-          <span className="uppercase">Connect Wallet to get started!</span>
+        <div className="flex  gap-2 items-center  text-white">
           <RainbowKitCustomConnectButton />
         </div>
-      )}
+      </header>
+    </div>
+
+      <main className="flex-1 flex justify-center items-start p-6">
+        {/* chat container */}
+        {connectedWalletAddress && tokenExists ? (
+          <div className="w-full max-w-[1200px] h-[calc(100vh-120px)]">
+            <div className="bg-black w-full h-full flex flex-col gap-4">
+              <div className="flex justify-end">
+                <button className="bg-[#8f259b] px-6 text-white h-[43px] rounded-full  hover:bg-[#8f259b]/90 transition-colors">
+                  Delete Chat History
+                </button>
+              </div>
+
+              <div className="flex-1 border border-[#8f259b] rounded-[10px] flex flex-col overflow-hidden mt-5">
+                <div
+                  ref={containerRef}
+                  className="flex-1 p-6 overflow-y-auto overflow-x-hidden no-scrollbar chat-scrollable-container"
+                >
+                  {messages.length === 0 && (
+                    <Fragment>
+                      <h4 className="text-white text-[24px] font-semibold">Ask {`DEFI AI`} with your prompt.</h4>
+                      <p className="text-[white]/70 mt-2 text-[20px]">
+                        AI Powered Conversational User Interface for Cryptocurrency.
+                      </p>
+                    </Fragment>
+                  )}
+
+                  {messages.length > 0 &&
+                    messages.map((message, index) =>
+                      message.confirmationCard ? (
+                        <div key={getRandomId()} className="w-full  mt-20">
+                          <ConfirmationCard
+                            message={message.message}
+                            data={message.data as any}
+                            deleteMessage={() => deleteMessage(index)}
+                            addMessage={addMessage}
+                            replaceMessage={replaceMessage}
+                            index={index}
+                          />
+                        </div>
+                      ) : message.audio ? (
+                        <div className="sent-audio flex flex-wrap justify-end pb-[25px]" key={getRandomId()}>
+                          <AudioPlayer
+                            src={URL.createObjectURL(message.audio)}
+                            autoPlay={false}
+                            onPlay={() => console.log("onPlay")}
+                            customAdditionalControls={[]}
+                            loop={false}
+                            autoPlayAfterSrcChange={false}
+                            showJumpControls={false}
+                            layout="horizontal-reverse"
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className={`relative ${message.role === "USER" ? "flex justify-end" : "flex justify-start"} ${
+                            message.role === "USER" ? "" : "rounded-lg leading-4"
+                          }`}
+                          key={getRandomId()}
+                        >
+                          {message.role === "USER" ? (
+                            <div className="text-white break-words text-right my-3 bg-[#242635] py-3 pl-[22px] pr-[78px] rounded-[8px] max-w-[60%]">
+                              {message.message}
+                            </div>
+                          ) : (
+                            <div className="flex gap-4 items-center max-w-[60%] my-3">
+                              <div className="text-white break-words text-left bg-[#8f259b] py-3   pl-[22px] pr-[78px] rounded-[8px]">
+                                {message?.hasImage && (
+                                  <img
+                                    src={`data:image/png;base64,${message?.data}`}
+                                    alt="chart-image"
+                                    className={"size-fit py-2 px-4 pb-4"}
+                                  />
+                                )}
+                                <div
+                                  key={getRandomId()}
+                                  className={` font-medium  text-[16px] max-sm:text-[15px]  pt-0 text-wrap break-words text-base leading-[24px]`}
+                                >
+                                  <Markdown
+                                    children={message.message}
+                                    components={{
+                                      a: ({ node, ...props }) => (
+                                        <a
+                                          style={{
+                                            textDecoration: "underline",
+                                            marginBottom: "1em",
+                                          }}
+                                          target="_blank"
+                                          {...props}
+                                        />
+                                      ),
+                                      p: ({ node, ...props }) => <p {...props} />,
+                                      h1: ({ node, ...props }) => (
+                                        <h1
+                                          style={{
+                                            marginTop: "1em",
+                                            marginBottom: "0.5em",
+                                          }}
+                                          {...props}
+                                        />
+                                      ),
+                                      h2: ({ node, ...props }) => (
+                                        <h2
+                                          style={{
+                                            marginTop: "1em",
+                                            marginBottom: "0.5em",
+                                          }}
+                                          {...props}
+                                        />
+                                      ),
+                                      li: ({ node, ...props }) => <li style={{ marginBottom: "0.5em" }} {...props} />,
+                                    }}
+                                  />
+
+                                  {/* show retry button if retryAvailable is true */}
+                                  {message?.retryAvailable && (
+                                    <button
+                                      className="text-white text-sm rounded-md p-2 mt-3 bg-[#B18C07] font-medium hover:bg-[#9d7c05]"
+                                      onClick={() => {
+                                        setIsMessageLoading(true);
+                                        if (message?.retryQuery) {
+                                          sendMessage(message?.retryQuery);
+                                        }
+                                        replaceMessage(index, {
+                                          ...message,
+                                          retryAvailable: false,
+                                        });
+                                      }}
+                                    >
+                                      {message?.retryText || "Retry Request"}
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ),
+                    )}
+
+                  {isMessageLoading && (
+                    <div className="py-4 bg-[#202020] w-[100px] flex self-start justify-center items-center rounded-[26px]">
+                      <span className="loader"></span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-2">
+                <ChatInput
+                  ref={chatInputRef}
+                  sendBtnHandler={handleInputSend}
+                  setIsMessageLoading={setIsMessageLoading}
+                />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center items-center h-[80vh] ">
+            <div className="w-full max-w-[400px] flex  flex-col gap-4 bg-[#171717] rounded-[15px] p-8 text-white text-center">
+            <span className="text-xl font-medium">Connect Wallet to get started!</span>
+            <div className="flex flex-col gap-3 justify-center">
+              <RainbowKitCustomConnectButton />
+            </div>
+          </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 }

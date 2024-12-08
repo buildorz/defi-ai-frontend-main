@@ -10,12 +10,11 @@ export default function About() {
         <div className="md:pl-20 px-5 text-white ">
           <h6>About DEFI AI</h6>
           <h2 className="text-[38px] leading-[45px] mt-2">
-            Unlock the Future: <br className="md:block hidden " /> Experience the Power Of{" "}
-            <br className="md:block hidden " /> Our Web3 Platform
+           Simplifying Crypto, <br/>Empowering Everyone.
           </h2>
           <p className="text-sm w-[400px] mt-4">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum incidunt ti.\ Lorem ipsum dolor sit, amet
-            consectetur adipisicing
+           At DeFi AI, we believe decentralized finance should be simple, accessible, and efficient for everyone. Our mission is to transform how you interact with cryptocurrencies, providing a seamless and intelligent assistant that bridges the gap between technology and user convenience.
+
           </p>
           <button className="h-[38px] px-5 bg-[#8f259b] mt-6 rounded-full text-sm">Get Started</button>
         </div>

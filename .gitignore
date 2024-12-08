@@ -21,3 +21,9 @@ node_modules
 
 # cli
 dist
+
+# env files 
+.env
+.env.local
+.env.development
+.env.production

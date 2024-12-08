@@ -99,7 +99,7 @@ const ConfirmationCard = ({
         }),
         id: null,
         hasImage: false,
-        data: ""
+        data: "",
       });
     } catch (e) {
       console.log(`error in handleAccept`, e);
@@ -113,7 +113,7 @@ const ConfirmationCard = ({
         retryQuery: "the last request failed. retry with same properties",
         id: null,
         hasImage: false,
-        data: ""
+        data: "",
       });
     }
 
@@ -121,7 +121,7 @@ const ConfirmationCard = ({
   };
 
   return (
-    <div className="bg-white/[.08] w-full rounded-2xl flex flex-col text-white p-4 gap-4">
+    <div className="bg-white/[.08] w-[50%] rounded-2xl flex flex-col text-white p-4 gap-4">
       <span>{data?.constructedMessage ?? "Please Confirm this transaction"}</span>
       <div className="break-normal">
         <Markdown>{message}</Markdown>

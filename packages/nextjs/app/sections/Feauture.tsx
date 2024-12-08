@@ -12,13 +12,12 @@ export default function Feauture() {
             With your voice
           </h2>
           <p className="text-sm w-[400px] mt-4">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum incidunt ti.\ Lorem ipsum dolor sit, amet
-            consectetur adipisicing
+       DeFi AI lets you manage your crypto hands-free with simple voice commands. From checking trends to making transactions, it's DeFi made effortless.
           </p>
           <button className="h-[38px] px-5 bg-[#8f259b] mt-6 rounded-full text-sm">Get Started</button>
         </div>
         <div className="pl-[100px] ">
-          <Image src="/about.png" width={734} height={500} alt="about" unoptimized />
+          <Image src="/voicee.png" width={734} height={500} alt="voice" unoptimized />
         </div>
       </div>
     </div>

@@ -1,8 +1,11 @@
+"use client";
+
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import record from "./assets/record.png";
 import send1 from "./assets/right.svg";
 import { AiOutlineSend } from "react-icons/ai";
 import { CiMicrophoneOn } from "react-icons/ci";
+
 
 type ChatInputProps = {
   sendBtnHandler: (audioBlob: Blob | null, textInput: string | null) => void;
@@ -13,7 +16,9 @@ type ChatInputRef = {
   clearCanvas: () => void;
 };
 
+
 const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(({ sendBtnHandler, setIsMessageLoading }, ref) => {
+  const [isInput, setIsInput] = useState<boolean>(false);
   const [textInput, setTextInput] = useState<string>("");
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -157,7 +162,11 @@ const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(({ sendBtnHandler, se
 
   // Render component
   return (
-    <div className="flex justify-between items-center border border-white/50 rounded-[10px] px-5">
+    <div
+      className={`flex justify-between items-center border  rounded-[10px] px-5 ${
+        isInput ? "border-[#8f259b]" : "border-white/50"
+      }`}
+    >
       {" "}
       <div className="flex w-full items-center space-x-2">
         {!isRecording && !showRecordingDuration ? (
@@ -168,6 +177,8 @@ const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(({ sendBtnHandler, se
             className="w-full bg-transparent outline-none text-[#8E8E8E] placeholder:text-white/70 placeholder:font-medium px-6 h-[48px] md:h-[54px]"
             placeholder="Type here..."
             onKeyDown={handleKeyDown}
+            onFocus={() => setIsInput(true)}
+            onBlur={() => setIsInput(false)}
           />
         ) : isRecording ? (
           // Recording in progress

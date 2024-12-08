@@ -82,9 +82,9 @@ export const Header = () => {
         <ul className="hidden lg:flex gap-7">
           <HeaderMenuLinks />
         </ul>
-         <button className="bg-[#8f259b] px-5 h-[40px] text-white text-sm rounded-full ">
+      <Link href='/chat'>   <button className="bg-[#8f259b] px-5 h-[40px] text-white text-sm rounded-full cursor-pointer ">
           Try now
-        </button>
+        </button></Link>
       </div>
     </div>
 

@@ -1,3 +1,5 @@
+import { SUPPORTED_BLOCKCHAINS } from "~~/utils/constants";
+
 export const addToLocalStorage = <T>(key: string, value: T): void => {
   localStorage.setItem(key, JSON.stringify(value));
 };
@@ -13,4 +15,19 @@ export const removeFromLocalStorage = (key: string): void => {
 
 export const getRandomId = (): string => {
   return crypto.randomUUID();
+};
+
+export const getBlockchainNameFromId = (chainId: number): string => {
+  switch (chainId) {
+    case 1:
+      return SUPPORTED_BLOCKCHAINS.ETHEREUM;
+    case 137:
+      return SUPPORTED_BLOCKCHAINS.POLYGON;
+    case 56:
+      return SUPPORTED_BLOCKCHAINS.BSC;
+    case 43114:
+      return SUPPORTED_BLOCKCHAINS.BASE;
+    default:
+      return "UNKNOWN";
+  }
 };
