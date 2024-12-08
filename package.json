@@ -22,10 +22,15 @@
   },
   "packageManager": "yarn@3.2.3",
   "devDependencies": {
-    "husky": "~8.0.3",
     "lint-staged": "~13.2.2"
   },
   "engines": {
     "node": ">=18.18.0"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "ethers": "^6.13.4",
+    "react-fast-marquee": "^1.6.5",
+    "react-icons": "^5.4.0"
   }
 }
