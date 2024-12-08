@@ -1,3 +1,6 @@
+![WhatsApp Image 2024-12-08 at 8 39 02 AM](https://github.com/user-attachments/assets/53a7cc55-60bd-48e7-86bb-09c1327711ff)
+
+
 # 🏗 Scaffold-ETH 2
 
 <h4 align="center">
