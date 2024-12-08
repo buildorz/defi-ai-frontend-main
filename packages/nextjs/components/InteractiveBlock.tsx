@@ -5,7 +5,6 @@ import Image from "next/image";
 import { Header } from "./Header";
 import Marquee from "react-fast-marquee";
 
-
 const InteractiveBlocks: React.FC = () => {
   const blockContainerRef = useRef<HTMLDivElement>(null);
   const blockSize = 70;
@@ -74,20 +73,21 @@ const InteractiveBlocks: React.FC = () => {
     };
   }, []);
 
- const [isMinivoice, setIsMinivoice] = useState(true); 
+  const [isMinivoice, setIsMinivoice] = useState(true);
 
- const handleToggle = () => {
-   setIsMinivoice(prevState => !prevState); 
- };
+  const handleToggle = () => {
+    setIsMinivoice(prevState => !prevState);
+  };
 
   return (
     <div className="relative ">
       <div id="blocks" ref={blockContainerRef}></div>
-
-      <div className="text-white content flex-col ">
+      <div className="relative text-white ">
         <div className="flex items-center justify-center">
           <Header />
         </div>
+      </div>
+      <div className="text-white content flex-col ">
         <div className="  md:px-0 px-5 mt-[100px] flex flex-col items-center">
           <p className="px-6 h-[38px] border border-white/20 rounded-full flex justify-center items-center  text-xs">
             Welcome to DEFI AI
@@ -95,7 +95,7 @@ const InteractiveBlocks: React.FC = () => {
           <h1 className="md:text-[50px] text-[38px] text-center md:leading-[52px] leading-[45px] mt-6">
             Your Smart, Seamless Gateway to DeFi
           </h1>
-          <p className="text-sm text-[#ffffff]/50 mt-4 w-[600px] text-center">
+          <p className="text-sm text-[#ffffff]/50 mt-4 md:w-[600px] text-center">
             DeFi AI is your ultimate cryptocurrency assistant, combining cutting-edge artificial intelligence with the
             power of decentralized finance. Whether you&apos;re a seasoned investor or just starting your crypto
             journey, DeFi AI simplifies managing your digital assets across multiple blockchains. .
@@ -135,12 +135,10 @@ const InteractiveBlocks: React.FC = () => {
             </div>
           </div>
           <div className="relative col-span-1 bg-[#1c1c1c] p-5 rounded-[12px] md:h-full h-[250px] overflow-hidden">
-            <div className="flex justify-between items-center">
+            <div className="flex gap-3 items-center">
               {" "}
               <h4 className="text-[24px]">Voice Command</h4>
-              <div onClick={handleToggle} className="cursor-pointer w-[50px] h-[30px] bg-[#0f0f0f] relative rounded-full py-[3px] ">
-                <div className="w-[24px] h-[24px] bg-[#8f259b] rounded-full absolute right-[3px] "></div>
-              </div>
+              <p className="text-[10px] bg-[#8f259b] px-2 py-[3px] rounded-full">New</p>
             </div>
             <p className="text-sm w-[300px] mt-2">
               Talk to DeFi AI like you would a friend. From swapping tokens to checking your portfolio, just say the
@@ -153,7 +151,7 @@ const InteractiveBlocks: React.FC = () => {
                     <div className="w-full h-full border border-[#ececec46] rounded-full p-6">
                       <Image
                         className="absolute -bottom-[60px] right-[100px] "
-                       src={isMinivoice ? "/minivoice.png" : "/Voice1.png"} 
+                        src="/minivoice.png" 
                         alt="swap"
                         width={200}
                         height={200}
@@ -221,7 +219,7 @@ const InteractiveBlocks: React.FC = () => {
             <div className="relative overflow-hidden bg-[#1c1c1c] p-5 rounded-[12px] h-[250px]">
               <div className="flex items-center gap-3 relative z-[10]">
                 <h4 className="text-[24px] ">Gas Fee Insight</h4>
-                <p className="text-[10px] bg-[#8f259b] px-2 py-[3px] rounded-full">New</p>
+               
               </div>
               <p className="text-sm w-[300px] relative z-[10]">
                 Stay ahead of network congestion by checking the current gas fees for all supported blockchains. Plan

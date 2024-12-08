@@ -74,7 +74,7 @@ export const Header = () => {
  
    <div className="fixed top-5 z-[100000] md:w-auto w-full px-5 md:px-0">
       <div className=" md:w-[600px]  w-full flex  justify-between items-center  bg-[#ffffff1a] border border-gray-600/20  backdrop-blur-[100px] p-1.5  rounded-full">
-        <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6 shrink-0">
+        <Link href="/" passHref className="">
           <div className="flex relative w-10 h-10">
             <Image alt="defiai logo" className="cursor-pointer" fill src="/DefiAIlogo.png" />
           </div>

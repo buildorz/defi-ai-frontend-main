@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import about from "../../../assets/about.png";
+import Link from "next/link";
 
 export default function About() {
   return (
@@ -16,7 +17,7 @@ export default function About() {
            At DeFi AI, we believe decentralized finance should be simple, accessible, and efficient for everyone. Our mission is to transform how you interact with cryptocurrencies, providing a seamless and intelligent assistant that bridges the gap between technology and user convenience.
 
           </p>
-          <button className="h-[38px] px-5 bg-[#8f259b] mt-6 rounded-full text-sm">Get Started</button>
+   <Link href="/chat">       <button className="h-[38px] px-5 bg-[#8f259b] mt-6 rounded-full text-sm">Get Started</button></Link>
         </div>
       </div>
     </div>

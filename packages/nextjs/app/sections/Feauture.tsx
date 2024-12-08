@@ -1,6 +1,7 @@
 import React from "react";
-import about from "../../../assets/about.png";
 import Image from "next/image";
+import Link from "next/link";
+import about from "../../../assets/about.png";
 
 export default function Feauture() {
   return (
@@ -12,9 +13,12 @@ export default function Feauture() {
             With your voice
           </h2>
           <p className="text-sm w-[400px] mt-4">
-       DeFi AI lets you manage your crypto hands-free with simple voice commands. From checking trends to making transactions, it's DeFi made effortless.
+            {`DeFi AI lets you manage your crypto hands-free with simple voice commands. From checking trends to making transactions, it's DeFi made effortless.`}
           </p>
-          <button className="h-[38px] px-5 bg-[#8f259b] mt-6 rounded-full text-sm">Get Started</button>
+          <Link href="/chat">
+            {" "}
+            <button className="h-[38px] px-5 bg-[#8f259b] mt-6 rounded-full text-sm">Get Started</button>
+          </Link>
         </div>
         <div className="pl-[100px] ">
           <Image src="/voicee.png" width={734} height={500} alt="voice" unoptimized />

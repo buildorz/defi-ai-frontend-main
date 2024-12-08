@@ -1,11 +1,8 @@
 "use client";
 
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import record from "./assets/record.png";
-import send1 from "./assets/right.svg";
 import { AiOutlineSend } from "react-icons/ai";
 import { CiMicrophoneOn } from "react-icons/ci";
-
 
 type ChatInputProps = {
   sendBtnHandler: (audioBlob: Blob | null, textInput: string | null) => void;
@@ -15,7 +12,6 @@ type ChatInputProps = {
 type ChatInputRef = {
   clearCanvas: () => void;
 };
-
 
 const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(({ sendBtnHandler, setIsMessageLoading }, ref) => {
   const [isInput, setIsInput] = useState<boolean>(false);
@@ -182,7 +178,7 @@ const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(({ sendBtnHandler, se
           />
         ) : isRecording ? (
           // Recording in progress
-          <div className="flex-grow h-[48px] md:h-[54px] border-[1.5px] border-[#8E8E8E] rounded-[16px] md:rounded-[20px] bg-transparent flex items-center px-4">
+          <div className="flex-grow h-[48px] md:h-[54px]  bg-transparent flex items-center px-4">
             {/* Audio visualizer */}
             <div className="flex-grow h-8 flex  items-center">
               {visualizerData.map((value, index) => (
@@ -208,7 +204,7 @@ const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(({ sendBtnHandler, se
           </div>
         ) : (
           // Recording finished, ready to send or play
-          <div className="flex-grow h-[48px] md:h-[54px] border-[1.5px] border-[#8E8E8E] rounded-[16px] md:rounded-[20px] bg-transparent flex items-center px-4 justify-between">
+          <div className="flex-grow h-[48px] md:h-[54px]   bg-transparent flex items-center px-4 justify-between">
             <span className="text-white mr-2">Voice message: {formatDuration(recordingDuration)}</span>
 
             <div>
@@ -251,7 +247,7 @@ const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(({ sendBtnHandler, se
       </div>
       <div className="flex items-center gap-5">
         {/* Record button */}
-        <CiMicrophoneOn className="text-[#8f259b] text-[25px]" onClick={startRecording} />
+        <CiMicrophoneOn className="text-[#8f259b] text-[25px] cursor-pointer" onClick={startRecording} />
 
         {/* Send button */}
         <AiOutlineSend
@@ -269,4 +265,5 @@ const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(({ sendBtnHandler, se
   );
 });
 
+ChatInput.displayName = "ChatInput";
 export default ChatInput;

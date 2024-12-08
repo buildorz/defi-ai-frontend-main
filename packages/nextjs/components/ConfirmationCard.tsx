@@ -126,15 +126,15 @@ const ConfirmationCard = ({
       <div className="break-normal">
         <Markdown>{message}</Markdown>
       </div>
-      <div className="flex justify-between w-full max-w-[500px] left-0 right-0 m-auto mt-2">
+      <div className="flex justify-between w-full  mt-2">
         <button
-          className="text-white bg-reject-red h-[35px] rounded-xl py-1 px-6 sm:px-12 text-[16px] transition ease-in-out duration-200 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+          className="text-white bg-[#FFC107]  rounded-md py-3 px-6 sm:px-12 text-[16px] transition ease-in-out duration-200 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
           onClick={handleDecline}
         >
           Decline
         </button>
         <button
-          className="bg-confirm-green h-[35px] flex justify-center items-center rounded-xl py-1 px-6 sm:px-12 text-[16px] text-white transition ease-in-out duration-200 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          className="bg-[#26A69A] rounded-md py-2 px-6 sm:px-12  flex justify-center items-center  text-[16px] text-white transition ease-in-out duration-200 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           onClick={() => handleAccept(data)}
         >
           {isConfirmLoading ? <span className="confirmBtnLoaderGray"></span> : <span>Confirm</span>}

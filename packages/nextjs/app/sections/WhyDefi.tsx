@@ -1,5 +1,5 @@
 import React from "react";
-
+import Link from "next/link";
 
 export default function WhyDefi() {
   const cards = [
@@ -45,7 +45,6 @@ export default function WhyDefi() {
     },
   ];
 
-
   return (
     <div className="max-w-[1440px] mx-auto py-[100px]">
       <div className="grid md:grid-cols-2 grid-cols-1 px-5 text-white">
@@ -59,7 +58,10 @@ export default function WhyDefi() {
             </div>
             <div>
               <p className="text-sm">Ready to give it a try?</p>
-              <button className="h-[38px] px-5 bg-[#8f259b] mt-2 rounded-full text-sm">Get Started</button>
+              <Link href="/chat">
+                {" "}
+                <button className="h-[38px] px-5 bg-[#8f259b] mt-2 rounded-full text-sm">Get Started</button>
+              </Link>
             </div>
           </div>
         </div>

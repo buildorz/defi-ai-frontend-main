@@ -428,16 +428,16 @@ export default function Chat() {
   return (
     <div className="min-h-screen flex flex-col bg-black">
       {/* Header with logo */}
-    <div className="flex justify-center">
+      <div className="flex justify-center">
         <header className="relative z-[100] w-[600px] bg-[#ffffff1a] border border-gray-600/20  backdrop-blur-[100px] p-1.5  rounded-full   flex justify-between items-center mt-5 ">
-        <div className="relative w-8 h-8">
-          <Image alt="defiai logo" className="cursor-pointer" fill src="/DefiAIlogo.png" />
-        </div>
-        <div className="flex  gap-2 items-center  text-white">
-          <RainbowKitCustomConnectButton />
-        </div>
-      </header>
-    </div>
+          <div className="relative w-8 h-8">
+            <Image alt="defiai logo" className="cursor-pointer" fill src="/DefiAIlogo.png" />
+          </div>
+          <div className="flex  gap-2 items-center  text-white">
+            <RainbowKitCustomConnectButton />
+          </div>
+        </header>
+      </div>
 
       <main className="flex-1 flex justify-center items-start p-6">
         {/* chat container */}
@@ -450,7 +450,7 @@ export default function Chat() {
                 </button>
               </div>
 
-              <div className="flex-1 border border-[#8f259b] rounded-[10px] flex flex-col overflow-hidden mt-5">
+              <div className="flex-1  flex flex-col overflow-hidden mt-5">
                 <div
                   ref={containerRef}
                   className="flex-1 p-6 overflow-y-auto overflow-x-hidden no-scrollbar chat-scrollable-container"
@@ -498,12 +498,12 @@ export default function Chat() {
                           key={getRandomId()}
                         >
                           {message.role === "USER" ? (
-                            <div className="text-white break-words text-right my-3 bg-[#242635] py-3 pl-[22px] pr-[78px] rounded-[8px] max-w-[60%]">
+                            <div className="text-white break-words text-right my-3 bg-[#ffffff1a]   backdrop-blur-[100px] py-3 pl-[22px] pr-[78px] rounded-[20px] max-w-[60%]">
                               {message.message}
                             </div>
                           ) : (
                             <div className="flex gap-4 items-center max-w-[60%] my-3">
-                              <div className="text-white break-words text-left bg-[#8f259b] py-3   pl-[22px] pr-[78px] rounded-[8px]">
+                              <div className="text-white break-words text-left bg-[#8f259b] py-3   pl-[22px] pr-[78px] rounded-[20px]">
                                 {message?.hasImage && (
                                   <img
                                     src={`data:image/png;base64,${message?.data}`}
@@ -516,7 +516,6 @@ export default function Chat() {
                                   className={` font-medium  text-[16px] max-sm:text-[15px]  pt-0 text-wrap break-words text-base leading-[24px]`}
                                 >
                                   <Markdown
-                                    children={message.message}
                                     components={{
                                       a: ({ node, ...props }) => (
                                         <a
@@ -549,12 +548,14 @@ export default function Chat() {
                                       ),
                                       li: ({ node, ...props }) => <li style={{ marginBottom: "0.5em" }} {...props} />,
                                     }}
-                                  />
+                                  >
+                                    {message.message}
+                                  </Markdown>
 
                                   {/* show retry button if retryAvailable is true */}
                                   {message?.retryAvailable && (
                                     <button
-                                      className="text-white text-sm rounded-md p-2 mt-3 bg-[#B18C07] font-medium hover:bg-[#9d7c05]"
+                                      className="text-white text-sm rounded-md py-3 px-4 mt-7 bg-[#0a0a0a] font-medium "
                                       onClick={() => {
                                         setIsMessageLoading(true);
                                         if (message?.retryQuery) {
@@ -597,11 +598,11 @@ export default function Chat() {
         ) : (
           <div className="flex justify-center items-center h-[80vh] ">
             <div className="w-full max-w-[400px] flex  flex-col gap-4 bg-[#171717] rounded-[15px] p-8 text-white text-center">
-            <span className="text-xl font-medium">Connect Wallet to get started!</span>
-            <div className="flex flex-col gap-3 justify-center">
-              <RainbowKitCustomConnectButton />
+              <span className="text-xl font-medium">Connect Wallet to get started!</span>
+              <div className="flex flex-col gap-3 justify-center">
+                <RainbowKitCustomConnectButton />
+              </div>
             </div>
-          </div>
           </div>
         )}
       </main>
